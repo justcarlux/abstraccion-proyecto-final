@@ -147,15 +147,14 @@ class MenuState(EstadoJuego):
         botones = [("Jugar", 200), ("Reglas y Información", 270), ("Configurar", 340), ("Salir", 410)]
         for texto, y in botones:
             btn = fuente.render(texto, True, NEGRO)
-            pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO // 2 - 175, y, 355, 50))
+            pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO // 2 - 185, y, 370, 50))
             self.juego.pantalla.blit(btn, (self.juego.ANCHO // 2 - btn.get_width() // 2, y + 10))
 
         if sonidos_disponibles:
             fuente_sonido = pygame.font.Font(None, 30)
             texto_sonido = fuente_sonido.render("Sonido: ON" if self.juego.sonido_activado else "Sonido: OFF", True, NEGRO)
-            pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO - 120, 20, 120, 30))
-            self.juego.pantalla.blit(texto_sonido, (self.juego.ANCHO - 110, 20))
-
+            pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO - 140, 20, 128, 30))
+            self.juego.pantalla.blit(texto_sonido, (self.juego.ANCHO - 130, 25))
 
 class ConfigurarState(EstadoJuego):
     def manejar_eventos(self):
@@ -165,73 +164,67 @@ class ConfigurarState(EstadoJuego):
                 sys.exit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
+                mitad_ancho = self.juego.ANCHO // 2
+                mitad_alto = self.juego.ALTO // 2
 
-                # Control de tiempo límite (-10 segundos)
-                if (self.juego.ANCHO // 2 - 120 <= mouse_x <= self.juego.ANCHO // 2 - 70 and 
-                    130 <= mouse_y <= 180):
-                    if self.juego.tiempo_limite > 10:
-                        self.juego.tiempo_limite -= 10
-                        if self.juego.sonido_activado and sonidos_disponibles:
-                            sonido_click.play()
+                # Reproducir sonido de click si está activado
+                if self.juego.sonido_activado and sonidos_disponibles:
+                    sonido_click.play()
 
-                # Control de tiempo límite (+10 segundos)
-                elif (self.juego.ANCHO // 2 + 70 <= mouse_x <= self.juego.ANCHO // 2 + 120 and 
-                    130 <= mouse_y <= 180):
-                    if self.juego.tiempo_limite < 300:
-                        self.juego.tiempo_limite += 10
-                        if self.juego.sonido_activado and sonidos_disponibles:
-                            sonido_click.play()
-
-                # Control de tamaño del tablero (-1 tamaño)
-                elif (self.juego.ANCHO // 2 - 120 <= mouse_x <= self.juego.ANCHO // 2 - 70 and 
-                    270 <= mouse_y <= 320):
-                    if self.juego.TAM_CUADRICULA > 3:
-                        self.juego.TAM_CUADRICULA -= 1
-                        self.juego.actualizar_tamanos()
-                        if self.juego.sonido_activado and sonidos_disponibles:
-                            sonido_click.play()
-
-                # Control de tamaño del tablero (+1 tamaño)
-                elif (self.juego.ANCHO // 2 + 70 <= mouse_x <= self.juego.ANCHO // 2 + 120 and 
-                    270 <= mouse_y <= 320):
-                    if self.juego.TAM_CUADRICULA < 5:
-                        self.juego.TAM_CUADRICULA += 1
-                        self.juego.actualizar_tamanos()
-                        if self.juego.sonido_activado and sonidos_disponibles:
-                            sonido_click.play()
-
-                # Selección de forma cuadrada
-                elif (self.juego.ANCHO // 2 - 120 <= mouse_x <= self.juego.ANCHO // 2 - 20 and 
-                    380 <= mouse_y <= 420):
-                    self.juego.FORMA_CELDA = "cuadrado"
-                    if self.juego.sonido_activado and sonidos_disponibles:
-                        sonido_click.play()
-
-                # Selección de forma circular
-                elif (self.juego.ANCHO // 2 + 20 <= mouse_x <= self.juego.ANCHO // 2 + 120 and 
-                    380 <= mouse_y <= 420):
-                    self.juego.FORMA_CELDA = "circulo"
-                    if self.juego.sonido_activado and sonidos_disponibles:
-                        sonido_click.play()
-
-                # Control de color de celdas
-                colores = [BLANCO, ROJO, AMARILLO, AZUL, VERDE, NARANJA]
-                for i, color in enumerate(colores):
-                    x = self.juego.ANCHO // 2 - 140 + (i % 3) * 100
-                    y = 470 if i < 3 else 530
-                    if (x <= mouse_x <= x + 80 and y <= mouse_y <= y + 40):
-                        self.juego.COLOR_CELDA = color
-                        if self.juego.sonido_activado and sonidos_disponibles:
-                            sonido_click.play()
-
-                # Botón para volver al menú
-                if (self.juego.ANCHO // 2 - 75 <= mouse_x <= self.juego.ANCHO // 2 + 75 and 
-                    600 <= mouse_y <= 650):
+                # Botón Volver
+                if (mitad_ancho - 75 <= mouse_x <= mitad_ancho + 75 and 
+                    self.juego.ALTO - 70 <= mouse_y <= self.juego.ALTO - 20):
                     self.juego.cambiar_estado("menu")
 
+                # Control de tiempo
+                elif mitad_ancho - 300 <= mouse_x <= mitad_ancho - 50 and mitad_alto - 250 <= mouse_y <= mitad_alto - 50:
+                    # Botón -10
+                    if mitad_ancho - 290 <= mouse_x <= mitad_ancho - 240 and mitad_alto - 180 <= mouse_y <= mitad_alto - 140:
+                        self.juego.tiempo_limite = max(10, self.juego.tiempo_limite - 10)
+                    # Botón +10
+                    elif mitad_ancho - 220 <= mouse_x <= mitad_ancho - 170 and mitad_alto - 180 <= mouse_y <= mitad_alto - 140:
+                        self.juego.tiempo_limite += 10
+
+                # Control de tamaño del tablero
+                elif mitad_ancho - 300 <= mouse_x <= mitad_ancho - 50 and mitad_alto - 30 <= mouse_y <= mitad_alto + 170:
+                    # Botón -1
+                    if mitad_ancho - 290 <= mouse_x <= mitad_ancho - 240 and mitad_alto + 40 <= mouse_y <= mitad_alto + 80:
+                        if self.juego.TAM_CUADRICULA > 3:
+                            self.juego.TAM_CUADRICULA -= 1
+                            self.juego.actualizar_tamanos()
+                    # Botón +1
+                    elif mitad_ancho - 220 <= mouse_x <= mitad_ancho - 170 and mitad_alto + 40 <= mouse_y <= mitad_alto + 80:
+                        if self.juego.TAM_CUADRICULA < 5:
+                            self.juego.TAM_CUADRICULA += 1
+                            self.juego.actualizar_tamanos()
+
+                # Control de forma de celdas
+                elif mitad_ancho + 50 <= mouse_x <= mitad_ancho + 300 and mitad_alto - 250 <= mouse_y <= mitad_alto - 50:
+                    # Botón Cuadrado
+                    if mitad_ancho + 60 <= mouse_x <= mitad_ancho + 160 and mitad_alto - 180 <= mouse_y <= mitad_alto - 140:
+                        self.juego.FORMA_CELDA = "cuadrado"
+                    # Botón Círculo
+                    elif mitad_ancho + 180 <= mouse_x <= mitad_ancho + 280 and mitad_alto - 180 <= mouse_y <= mitad_alto - 140:
+                        self.juego.FORMA_CELDA = "circulo"
+
+                # Control de color de celdas
+                elif mitad_ancho + 50 <= mouse_x <= mitad_ancho + 300 and mitad_alto - 30 <= mouse_y <= mitad_alto + 170:
+                    colores = [BLANCO, ROJO, AMARILLO, AZUL, VERDE, NARANJA]
+                    # Primera fila de colores
+                    for i in range(3):
+                        x = mitad_ancho + 70 + i * 70
+                        y = mitad_alto + 40
+                        if x <= mouse_x <= x + 60 and y <= mouse_y <= y + 30:
+                            self.juego.COLOR_CELDA = colores[i]
+                    # Segunda fila de colores
+                    for i in range(3):
+                        x = mitad_ancho + 70 + i * 70
+                        y = mitad_alto + 80
+                        if x <= mouse_x <= x + 60 and y <= mouse_y <= y + 30:
+                            self.juego.COLOR_CELDA = colores[i+3]
     def dibujar(self):
         fondo = pygame.image.load("fondo_configuracion.png")
-        fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
+        fondo = pygame.transform.scale(fondo, (self.juego.ANCHO, self.juego.ALTO))
         self.juego.pantalla.blit(fondo, (0, 0))
 
         # Título de configuración
@@ -240,68 +233,135 @@ class ConfigurarState(EstadoJuego):
         texto_titulo = fuente.render("Configuración del Juego", True, BLANCO)
         self.juego.pantalla.blit(texto_titulo, (self.juego.ANCHO // 2 - texto_titulo.get_width() // 2, 30))
 
-        # Configuración de tiempo límite
-        texto_tiempo = fuente.render(f"Tiempo límite: {self.juego.tiempo_limite} s", True, BLANCO)
-        self.juego.pantalla.blit(texto_tiempo, (self.juego.ANCHO // 2 - texto_tiempo.get_width() // 2, 80))
+        # Dividir la pantalla en 4 cuadrantes
+        mitad_ancho = self.juego.ANCHO // 2
+        mitad_alto = self.juego.ALTO // 2
+
+        # ----------------------------
+        # Cuadrante Superior Izquierdo: Tiempo
+        # ----------------------------
+        texto_tiempo = fuente.render("Tiempo límite:", True, BLANCO)
+        self.juego.pantalla.blit(texto_tiempo, (mitad_ancho - 290, mitad_alto - 240))
+
+        texto_valor = fuente.render(f"{self.juego.tiempo_limite} s", True, BLANCO)
+        self.juego.pantalla.blit(texto_valor, (mitad_ancho - 110, mitad_alto - 240))
 
         # Botones -/+ para tiempo
-        menos_t = fuente.render("-", True, NEGRO)
-        mas_t = fuente.render("+", True, NEGRO)
-        pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO // 2 - 120, 130, 50, 50))
-        self.juego.pantalla.blit(menos_t, (self.juego.ANCHO // 2 - 110, 135))
-        pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO // 2 + 70, 130, 50, 50))
-        self.juego.pantalla.blit(mas_t, (self.juego.ANCHO // 2 + 85, 135))
+        menos_t = fuente.render("-10", True, NEGRO)
+        mas_t = fuente.render("+10", True, NEGRO)
+        pygame.draw.rect(self.juego.pantalla, BLANCO, (mitad_ancho - 290, mitad_alto - 180, 50, 40))
+        self.juego.pantalla.blit(menos_t, (mitad_ancho - 280, mitad_alto - 170))
+        pygame.draw.rect(self.juego.pantalla, BLANCO, (mitad_ancho - 220, mitad_alto - 180, 50, 40))
+        self.juego.pantalla.blit(mas_t, (mitad_ancho - 210, mitad_alto - 170))
 
-        # Configuración de tamaño del tablero
-        texto_tamano = fuente.render(f"Tamaño tablero: {self.juego.TAM_CUADRICULA}x{self.juego.TAM_CUADRICULA}", True, BLANCO)
-        self.juego.pantalla.blit(texto_tamano, (self.juego.ANCHO // 2 - texto_tamano.get_width() // 2, 220))
+        # ----------------------------
+        # Cuadrante Inferior Izquierdo: Tamaño del tablero
+        # ----------------------------
+        texto_tamano = fuente.render("Tamaño tablero:", True, BLANCO)
+        self.juego.pantalla.blit(texto_tamano, (mitad_ancho - 290, mitad_alto - 20))
+
+        texto_valor = fuente.render(f"{self.juego.TAM_CUADRICULA}x{self.juego.TAM_CUADRICULA}", True, BLANCO)
+        self.juego.pantalla.blit(texto_valor, (mitad_ancho - 90, mitad_alto - 20))
 
         # Botones -/+ para tamaño
-        menos_s = fuente.render("-", True, NEGRO)
-        mas_s = fuente.render("+", True, NEGRO)
-        pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO // 2 - 120, 270, 50, 50))
-        self.juego.pantalla.blit(menos_s, (self.juego.ANCHO // 2 - 110, 275))
-        pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO // 2 + 70, 270, 50, 50))
-        self.juego.pantalla.blit(mas_s, (self.juego.ANCHO // 2 + 85, 275))
+        menos_s = fuente.render("-1", True, NEGRO)
+        mas_s = fuente.render("+1", True, NEGRO)
+        pygame.draw.rect(self.juego.pantalla, BLANCO, (mitad_ancho - 290, mitad_alto + 40, 50, 40))
+        self.juego.pantalla.blit(menos_s, (mitad_ancho - 280, mitad_alto + 50))
+        pygame.draw.rect(self.juego.pantalla, BLANCO, (mitad_ancho - 220, mitad_alto + 40, 50, 40))
+        self.juego.pantalla.blit(mas_s, (mitad_ancho - 210, mitad_alto + 50))
 
         # Indicación de opciones de tamaño
         texto_opciones = fuente_pequena.render("(3x3, 4x4 o 5x5)", True, BLANCO)
-        self.juego.pantalla.blit(texto_opciones, (self.juego.ANCHO // 2 - texto_opciones.get_width() // 2, 310))
+        self.juego.pantalla.blit(texto_opciones, (mitad_ancho - 290, mitad_alto + 90))
+        
+        # ----------------------------
+        # Cuadrante Superior Derecho: Forma de celdas
+        # ----------------------------
+        texto_forma = fuente.render("Forma de celdas:", True, BLANCO)
+        self.juego.pantalla.blit(texto_forma, (mitad_ancho + 60, mitad_alto - 240))
 
-        # Configuración de forma de celdas
-        texto_forma = fuente.render(f"Forma celdas: {self.juego.FORMA_CELDA}", True, BLANCO)
-        self.juego.pantalla.blit(texto_forma, (self.juego.ANCHO // 2 - texto_forma.get_width() // 2, 340))
+        # Mensaje de forma actual
+        forma_actual = "Cuadrado" if self.juego.FORMA_CELDA == "cuadrado" else "Círculo"
+        texto_actual = fuente_pequena.render(f"Actual: {forma_actual}", True, BLANCO)
+        self.juego.pantalla.blit(texto_actual, (mitad_ancho + 60, mitad_alto - 210))
 
         # Botones para selección de forma
-        pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO // 2 - 120, 380, 130, 40))
-        self.juego.pantalla.blit(fuente.render("Cuadrado", True, NEGRO), (self.juego.ANCHO // 2 - 110, 385))
+        pygame.draw.rect(self.juego.pantalla, BLANCO, (mitad_ancho + 60, mitad_alto - 180, 130, 40))
+        self.juego.pantalla.blit(fuente.render("Cuadrado", True, NEGRO), (mitad_ancho + 70, mitad_alto - 170))
 
-        pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO // 2 + 20, 380, 100, 40))
-        self.juego.pantalla.blit(fuente.render("Círculo", True, NEGRO), (self.juego.ANCHO // 2 + 30, 385))
+        pygame.draw.rect(self.juego.pantalla, BLANCO, (mitad_ancho + 220, mitad_alto - 180, 100, 40))
+        self.juego.pantalla.blit(fuente.render("Círculo", True, NEGRO), (mitad_ancho + 230, mitad_alto - 170))
 
-        # Configuración de color de celdas
-        texto_color = fuente.render("Color celdas:", True, BLANCO)
-        self.juego.pantalla.blit(texto_color, (self.juego.ANCHO // 2 - texto_color.get_width() // 2, 440))
+        # ----------------------------
+        # Cuadrante Inferior Derecho: Color de celdas
+        # ----------------------------
+        texto_color = fuente.render("Color de celdas:", True, BLANCO)
+        self.juego.pantalla.blit(texto_color, (mitad_ancho + 60, mitad_alto - 20))
 
-        # Mostrar opciones de colores
+        # Mensaje de color actual
+        nombre_color_actual = ""
+        if self.juego.COLOR_CELDA == BLANCO:
+            nombre_color_actual = "Blanco"
+        elif self.juego.COLOR_CELDA == ROJO:
+            nombre_color_actual = "Rojo"
+        elif self.juego.COLOR_CELDA == AMARILLO:
+            nombre_color_actual = "Amarillo"
+        elif self.juego.COLOR_CELDA == AZUL:
+            nombre_color_actual = "Azul"
+        elif self.juego.COLOR_CELDA == VERDE:
+            nombre_color_actual = "Verde"
+        elif self.juego.COLOR_CELDA == NARANJA:
+            nombre_color_actual = "Naranja"
+
+        texto_color_actual = fuente_pequena.render(f"Actual: {nombre_color_actual}", True, BLANCO)
+        self.juego.pantalla.blit(texto_color_actual, (mitad_ancho + 60, mitad_alto + 10))
+
+        # Mostrar opciones de colores en 2 filas
         colores = [BLANCO, ROJO, AMARILLO, AZUL, VERDE, NARANJA]
         nombres_colores = ["Blanco", "Rojo", "Amarillo", "Azul", "Verde", "Naranja"]
 
-        for i, (color, nombre) in enumerate(zip(colores, nombres_colores)):
-            x = self.juego.ANCHO // 2 - 140 + (i % 3) * 100
-            y = 470 if i < 3 else 530
-            pygame.draw.rect(self.juego.pantalla, color, (x, y, 80, 40))
-            pygame.draw.rect(self.juego.pantalla, NEGRO, (x, y, 80, 40), 2)  # Borde
+        # Primera fila de colores (primeros 3 colores)
+        for i, color in enumerate(colores[:3]):
+            x = mitad_ancho + 70 + i * 70
+            y = mitad_alto + 40
+            pygame.draw.rect(self.juego.pantalla, color, (x, y, 60, 30))
+            pygame.draw.rect(self.juego.pantalla, NEGRO, (x, y, 60, 30), 2)
+            if hasattr(self.juego, 'COLOR_CELDA') and color == self.juego.COLOR_CELDA:
+                pygame.draw.rect(self.juego.pantalla, BLANCO, (x, y, 60, 30), 4)
 
-            # Resaltar el color seleccionado
-            if color == self.juego.COLOR_CELDA:
-                pygame.draw.rect(self.juego.pantalla, BLANCO, (x, y, 80, 40), 4)     
+        # Segunda fila de colores (resto de colores)
+        for i, color in enumerate(colores[3:]):
+            x = mitad_ancho + 70 + i * 70
+            y = mitad_alto + 80
+            pygame.draw.rect(self.juego.pantalla, color, (x, y, 60, 30))
+            pygame.draw.rect(self.juego.pantalla, NEGRO, (x, y, 60, 30), 2)
+            if hasattr(self.juego, 'COLOR_CELDA') and color == self.juego.COLOR_CELDA:
+               pygame.draw.rect(self.juego.pantalla, BLANCO, (x, y, 60, 30), 4)
+    
 
-         # Dibujar botón para volver al menú
-        pygame.draw.rect(self.juego.pantalla, BLANCO, (self.juego.ANCHO // 2 - 75, 600, 150, 50))
+       # Dibujar botón para volver al menú (centrado abajo)
+        ancho_boton = 150
+        alto_boton = 50
+        margen_inferior = 20  # Margen desde el borde inferior
+
+       # Posición del botón
+        boton_x = self.juego.ANCHO // 2 - ancho_boton // 2
+        boton_y = self.juego.ALTO - alto_boton - margen_inferior
+
+       # Dibujar botón
+        pygame.draw.rect(self.juego.pantalla, BLANCO, (boton_x, boton_y, ancho_boton, alto_boton))
+
+       # Renderizar texto
         texto_volver = fuente.render("Volver", True, NEGRO)
-        self.juego.pantalla.blit(texto_volver, (self.juego.ANCHO // 2 - texto_volver.get_width() // 2, 610))  
 
+       # Posición del texto (centrado horizontal y verticalmente en el botón)
+        texto_x = boton_x + (ancho_boton - texto_volver.get_width()) // 2
+        texto_y = boton_y + (alto_boton - texto_volver.get_height()) // 2
+
+      # Dibujar texto
+        self.juego.pantalla.blit(texto_volver, (texto_x, texto_y))
+        
 class JugandoState(EstadoJuego):
     def manejar_eventos(self):
         if not self.juego.pausado:
@@ -437,12 +497,18 @@ class GanasteState(EstadoJuego):
         self.juego.pantalla.blit(fondo, (0, 0))
         fuente = pygame.font.Font(None, 60)
         sub = pygame.font.Font(None, 30)
+        # Posición de la parte inferior de la pantalla (ajustar según necesites)
+        pos_y_inferior = self.juego.ALTO // 2 + 110  # Esto coloca los textos más abajo
+    
+        # Mostrar los textos debajo de la imagen
         self.juego.pantalla.blit(sub.render(f"Clics: {self.juego.clics}", True, BLANCO), 
-                     (self.juego.ANCHO // 2 - 50, self.juego.ALTO // 2 - 110))
+                (self.juego.ANCHO // 2 - 50, pos_y_inferior))
+    
         self.juego.pantalla.blit(sub.render(f"Tiempo usado: {int(self.juego.tiempo_total)}s", True, BLANCO), 
-                     (self.juego.ANCHO // 2 - 100, self.juego.ALTO // 2 + 140))
-        self.juego.pantalla.blit(sub.render("Haz clic para volver al menú", True,BLANCO), 
-                     (self.juego.ANCHO // 2 - 130, self.juego.ALTO // 2 + 170))
+                (self.juego.ANCHO // 2 - 100, pos_y_inferior + 40))
+    
+        self.juego.pantalla.blit(sub.render("Haz clic para volver al menú", True, BLANCO), 
+                (self.juego.ANCHO // 2 - 130, pos_y_inferior + 80))
 
 class TiempoAgotadoState(EstadoJuego):
     def manejar_eventos(self):

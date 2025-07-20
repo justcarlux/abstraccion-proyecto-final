@@ -35,7 +35,7 @@ opciones_por_pagina = 4
 pagina_actual = 0    
 opciones_mezcladas = []  # Lista de opciones de alimentos mezcladas para paginación
 volumen=1
-  # Volumen inicial, 1 es máximo, 0 es silencio
+  
 def cargar_img(nombre, tam=None):
     ruta_completa = os.path.join(ruta_img, nombre)
     if not os.path.exists(ruta_completa):
@@ -132,8 +132,8 @@ def mezclar_opciones_juego():
 mezclar_opciones_juego()
 
 # Configuración de fuentes
-fuente_principal = pygame.font.Font("AGAALER.TTF", 60)
-fuente_comentarios = pygame.font.Font("AGAALER.TTF", 56)
+fuente_principal = pygame.font.Font(os.path.join(ruta_img, "AGAALER.TTF"), 60)
+fuente_comentarios = pygame.font.Font(os.path.join(ruta_img, "AGAALER.TTF"), 56)
 fuente_boton = pygame.font.SysFont(None, 44) 
 fuente_ins=  pygame.font.SysFont(None, 25)
 
@@ -668,7 +668,7 @@ def reglas():
         ventana.blit(gato_img_estatica, pos_gato)
         ventana.blit(letras_bienvenida, (400, 5))
        
-        rect_img = img_reglas.get_rect(center=( 850, 500))
+        rect_img = img_reglas.get_rect(center=(850, 500))
         ventana.blit(img_reglas, rect_img)
         
         pygame.display.flip()
