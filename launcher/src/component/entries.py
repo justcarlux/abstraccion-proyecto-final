@@ -50,7 +50,7 @@ class GameEntries():
         self.__register("Luces apagadas", "Lights out-grupo 3.py", (895, 200))
         self.__register("Colores mágicos", "ColoresMagicos.py", (895, 380))
         self.__register("Memoria", "src/main.py", (680, 550))
-        self.__register("Matigatito", "Matigatito.py", (330, 550))
+        self.__register("Súpergatito", "Supergatito.py", (330, 550))
         self.__register("Sopa de letras", "Sopa_de_letras_OAD-3.py", (40, 380))
         self.__register("Ahorcado", "main3.py", (40, 200))
 

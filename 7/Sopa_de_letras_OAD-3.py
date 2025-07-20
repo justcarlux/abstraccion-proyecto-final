@@ -15,14 +15,13 @@ ANCHO, ALTO = 1280, 720
 pygame.init()
 ventana = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Sopa de Letras")
-fuente = pygame.font.SysFont(None, 65)
+fuente_logrograste = pygame.font.SysFont('OpenDyslexic', 60)
 fuente_peque = pygame.font.SysFont(None, 55)
 
-# Cambia la fuente para la sopa de letras a Times New Roman
-fuente_sopa = pygame.font.SysFont('Times New Roman', 36)
-fuente_sopa_facil = pygame.font.SysFont('Times New Roman', 60)
-fuente_sopa_media = pygame.font.SysFont('Times New Roman', 40)
-fuente_sopa_dificil = pygame.font.SysFont('Times New Roman', 25)
+# Cambia la fuente para la sopa de letras
+fuente_sopa_facil = pygame.font.SysFont('OpenDyslexic', 60)
+fuente_sopa_media = pygame.font.SysFont('OpenDyslexic', 40)
+fuente_sopa_dificil = pygame.font.SysFont('OpenDyslexic', 25)
 
 activo = True
 
@@ -30,11 +29,11 @@ class SopaDeLetras:
     def __init__(self, filas, columnas):
         self.filas = 0
         self.columnas = 0
-        self.palabras_facil = ["SOL","MAR","RÍO","PEZ","REY","AGUA","FIN","TREN","LUNA",
-                               "PAN","FLOR","CASA","UÑA","OJO","PAZ","OSO","DÍA","MES","AÑO","SAL","MESA","VOZ","LUZ","CAMA"]
-        self.palabras_medio = ["CABALLO","CONEJO","BALLENA","JIRAFA","ZORRO","VENTANA","ELEFANTE","PINTURA","MÚSICA",
+        self.palabras_facil = ["SOL","MAR","RÍO","PEZ","REY","AGUA","FIN","TREN","LUNA","CUNA","MANO","DEDO",
+                               "PAN","FLOR","CASA","UÑA","OJO","PAZ","OSO","DÍA","MES","AÑO","SAL","MESA","VOZ","LUZ","CAMA","OLAS","ROSA","LIMA","PISO"]
+        self.palabras_medio = ["CABALLO","CONEJO","BALLENA","JIRAFA","ZORRO","VENTANA","ELEFANTE","PINTURA","MÚSICA","LAGO","PASTA","CARBÓN","CREMA","LIMÓN","MONTAÑA",
                                "PUMA","LEÓN","GALLINA","MORADO","DELFÍN","NUBES","VIAJAR","CANTAR","PANDA","ZEBRA","LIBRO","CARRO","MONEDA","AGUA","ÁRBOL","SUEÑO","LENTO", "DULCE","FAMILIA","CABELLO","JARDÍN"]
-        self.palabras_dificil = ["CORAZÓN","ESTRELLA","CHOCOLATE","TELÉFONO","ZANAHORIA","GUITARRA","ATARDECER","ESTUDIANTE","RECTÁNGULO",
+        self.palabras_dificil = ["CORAZÓN","ESTRELLA","CHOCOLATE","TELÉFONO","ZANAHORIA","GUITARRA","ATARDECER","ESTUDIANTE","RECTÁNGULO","GALLETA","JARRA","CAPTUS","NEVERA","BIBLIOTECA","HIELO","COMIDA","PARQUE","SONRISA",
                                "CIRCULO","AUTOBÚS","FERROCARIL","ESPEJO","ZAPATO","PLANETA","LINTERNA","FLORERO","ANUNCIO","TORTA","CAMINAR","ESPADA","FELICIDAD","HISTORIA","ENERGÍA","BATERÍA","IGLESIA"]
         # Direcciones: (fila, columna)
         self.direcciones = [
@@ -59,7 +58,7 @@ class SopaDeLetras:
     def colocar_palabra(self, palabra, direcciones):
         
         palabra = palabra.upper()
-        max_intentos = 100
+        max_intentos = 10000
 
         for _ in range(max_intentos):
             dir_fila, dir_col = random.choice(direcciones)
@@ -121,7 +120,7 @@ class SopaDeLetras:
             self.direcciones_usadas = direcciones
             self.filas, self.columnas = 10, 10
             self.sopa = [[' ' for _ in range(self.columnas)] for _ in range(self.filas)]
-            palabras = random.sample(self.palabras_medio, 6)
+            palabras = random.sample(self.palabras_medio, 9)
             self.palabras_en_sopa = palabras
             self.generar_sopa(palabras, direcciones)
         elif dificultad == "dificil":
@@ -130,7 +129,7 @@ class SopaDeLetras:
             self.direcciones_usadas = direcciones
             self.filas, self.columnas = 15, 15
             self.sopa = [[' ' for _ in range(self.columnas)] for _ in range(self.filas)]
-            palabras = random.sample(self.palabras_dificil, 9)
+            palabras = random.sample(self.palabras_dificil, 13)
             self.palabras_en_sopa = palabras
             self.generar_sopa(palabras, direcciones)
             
@@ -142,8 +141,7 @@ class SopaDeLetras:
                 if self.sopa[f][c] == ' ':
                     self.sopa[f][c] = random.choice('AÁÍÓÚÉBCDEFGHIJKLMNOPQRSTUVWXYZ')
 
-    def generar_sopa(self, palabras: List[str], direcciones):
-        print(palabras)
+    def generar_sopa(self, palabras: List[str], direcciones): 
         
         for palabra in palabras:
             self.colocar_palabra(palabra, direcciones)
@@ -156,11 +154,11 @@ niveles_img = pygame.image.load('imagenes/niveles.jpg')
 niveles_img = pygame.transform.scale(niveles_img, (ANCHO, ALTO))
 
 # Cargar imágenes de los botones de nivel en tamaño completo
-facil_img = pygame.image.load('imagenes/facil.png')
+facil_img = pygame.image.load('imagenes/facil.jpg')
 facil_img = pygame.transform.scale(facil_img, (ANCHO, ALTO))
 normal_img = pygame.image.load('imagenes/normal.png')
 normal_img = pygame.transform.scale(normal_img, (ANCHO, ALTO))
-dificil_img = pygame.image.load('imagenes/dificil.jpg')
+dificil_img = pygame.image.load('imagenes/dificil.png')
 dificil_img = pygame.transform.scale(dificil_img, (ANCHO, ALTO))
 
 # Cargar las imágenes de las ventanas de nivel
@@ -171,7 +169,17 @@ nivel_normal_img = pygame.transform.scale(nivel_normal_img, (ANCHO, ALTO))
 nivel_dificil_img = pygame.image.load('imagenes/nivel_dificil.png')
 nivel_dificil_img = pygame.transform.scale(nivel_dificil_img, (ANCHO, ALTO))
 
+ganador_img = pygame.image.load('imagenes/ganador.png')
+ganador_img = pygame.transform.scale(ganador_img, (ANCHO, ALTO)) 
+
+# Volumen inicial fijo
+pygame.mixer.music.load("sonidos/fondo.wav")
+pygame.mixer.music.set_volume(0.3)
+sonido_acierto = pygame.mixer.Sound("sonidos/acierto.wav")
+sonido_ganador = pygame.mixer.Sound("sonidos/level-win-6416.mp3")
+
 def menu_principal():
+    pygame.mixer.music.play(-1)  # Reproducir fondo en bucle
     rect_play = pygame.Rect(200, 570, 880, 100)
     rect_cerrar = pygame.Rect(40, 40, 100, 100)
     while True:
@@ -181,16 +189,20 @@ def menu_principal():
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.mixer.music.stop()
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if rect_play.collidepoint(event.pos):
                     seleccionar_nivel()
                 if rect_cerrar.collidepoint(event.pos):
+                    pygame.mixer.music.stop()
                     pygame.quit()
                     sys.exit()
 
 def seleccionar_nivel():
+    if not pygame.mixer.music.get_busy():
+        pygame.mixer.music.play(-1)
     # Definir áreas de los botones de nivel y volver para 1280x720
     rect_facil = pygame.Rect(150, 500, 350, 140)
     rect_normal = pygame.Rect(480, 500, 350, 140)
@@ -355,7 +367,7 @@ def jugar_sopa(dificultad):
                 if (f, c) in letras_encontradas:
                     color_letra = (0, 255, 0)  # Verde oscuro para palabras encontradas
                 elif (f, c) in seleccion:
-                    color_letra = (0, 0, 255)  # Azul para selección actual
+                    color_letra = (255, 102, 51 )  # naranja para selección actual
                 elif (f, c) in seleccion_invalida:
                     color_letra = (255, 0, 0)  # Rojo para selección incorrecta
                 else:
@@ -373,13 +385,21 @@ def jugar_sopa(dificultad):
                 ventana.blit(letra_img, letra_rect)
         
         # Dibujar lista de palabras
-        y_palabra = margen_palabras_y + 100  # Posición debajo de "PALABRAS"
+        y_palabra = margen_palabras_y + 70  # Posición debajo de "PALABRAS"
+        
         # Ajustar espaciado según la dificultad
         if dificultad == "dificil":
-            espaciado_palabras = 44  # Más separación para nivel difícil
+            espaciado_palabras = 35 # Más separación para nivel difícil
+            y_palabra = margen_palabras_y + 70  # Posición debajo de "PALABRAS dificil"
+            fuente_peque = pygame.font.SysFont(None, 38)
+        elif dificultad == "media":
+            espaciado_palabras = 50 # Separación para nivel normal
+            y_palabra = margen_palabras_y + 80  # Posición debajo de palabras normal
+            fuente_peque = pygame.font.SysFont(None, 50)
         else:
-            espaciado_palabras = 50
-            
+            espaciado_palabras = 60
+            y_palabra = margen_palabras_y + 120 # Posición debajo de palabras facil
+            fuente_peque = pygame.font.SysFont(None, 60)
         for palabra in palabras:
             if palabra in palabras_encontradas:
                 # Palabras encontradas en gris
@@ -395,21 +415,28 @@ def jugar_sopa(dificultad):
 
         # Verificar si se encontraron todas las palabras
         if len(palabras_encontradas) == len(palabras):
+            ventana.blit(ganador_img, (0, 0))
+            pygame.mixer.music.stop()
             # Mostrar mensaje de felicitación sobre la pantalla actual
-            mensaje = "¡FELICIDADES! Has encontrado todas las palabras"
-            mensaje2 = "Regresando al menú de niveles..."
-            texto1 = fuente.render(mensaje, True, (255, 255, 255))
-            texto2 = fuente_peque.render(mensaje2, True, (255, 255, 255))
+            mensaje = "LO LOGRASTE!"
+            mensaje2 = "Has encontrado todas las palabras"
+            mensaje3 = "Regresando al menú de niveles..."
+            texto1 = fuente_logrograste.render(mensaje, True, (200, 200, 200)) # Usar fuente_sopa_facil
+            texto2 = fuente_logrograste.render(mensaje2, True, (200, 200, 200)) # Usar fuente_sopa_facil
+            texto3 = fuente_peque.render(mensaje3, True, (255, 255, 255))
             rect1 = texto1.get_rect(center=(ANCHO//2, ALTO//2 - 50))
-            rect2 = texto2.get_rect(center=(ANCHO//2, ALTO//2 + 50))
+            rect2 = texto2.get_rect(center=((ANCHO - 10)//2, ALTO//2 + 50))
+            #rect3 = texto3.get_rect(center=(ANCHO - 50//2, ALTO//2 + 50))
             # Dibujar un fondo semitransparente para el mensaje
             s = pygame.Surface((ANCHO, ALTO), pygame.SRCALPHA)
             s.fill((0, 0, 0, 180))  # Negro semitransparente
             ventana.blit(s, (0, 0))
             ventana.blit(texto1, rect1)
             ventana.blit(texto2, rect2)
+            sonido_ganador.play()
             pygame.display.flip()
-            pygame.time.wait(3000)  # Esperar 3 segundos
+            pygame.time.wait(4000)  # Esperar 3 segundos
+            pygame.mixer.music.play(-1)
             return  # Regresar al menú de niveles
 
         if mostrar_error and time.time() - error_time > 0.5:
@@ -418,6 +445,7 @@ def jugar_sopa(dificultad):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.mixer.music.stop()
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -442,6 +470,7 @@ def jugar_sopa(dificultad):
                                 palabras_encontradas.append(palabra2.upper())
                             for f, c in seleccion:
                                 letras_encontradas.add((f, c))
+                            sonido_acierto.play()  # Reproducir sonido de acierto
                             seleccion = []
                     else:
                         # Si hace clic en una celda ya seleccionada, validar la selección (por si el usuario quiere forzar validación)
@@ -454,6 +483,7 @@ def jugar_sopa(dificultad):
                                 palabras_encontradas.append(palabra2.upper())
                             for f, c in seleccion:
                                 letras_encontradas.add((f, c))
+                            sonido_acierto.play()  # Reproducir sonido de acierto
                             seleccion = []
                         else:
                             seleccion_invalida = seleccion[:]
@@ -472,6 +502,7 @@ def jugar_sopa(dificultad):
                                 palabras_encontradas.append(palabra2.upper())
                             for f, c in seleccion:
                                 letras_encontradas.add((f, c))
+                            sonido_acierto.play()  # Reproducir sonido de acierto
                             seleccion = []
                         else:
                             seleccion_invalida = seleccion[:]
