@@ -43,6 +43,7 @@ class GameEntries():
     def __init__(self, surface: pygame.Surface):
         self.surface = surface
         self.entries: list[GameEntry] = []
+        self.hovered = False
         
         self.__register("Simon Says", "main.py", (330, 10))
         self.__register("Deslizamente", "intro_deslizamente.py", (680, 10))
@@ -57,17 +58,13 @@ class GameEntries():
         self.entries.append(GameEntry(len(self.entries), name, entry_file, coords))
         
     def draw(self):
-        hovered = False
+        self.hovered = False
         for entry in self.entries:
             entry.draw(self.surface)
             if entry.hovered:
-                hovered = True
-        if (hovered):
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-        else:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                self.hovered = True
             
-    def on_click(self):
+    def on_screen_click(self):
         for entry in self.entries:
             if entry.hovered:
                 entry.on_click()
