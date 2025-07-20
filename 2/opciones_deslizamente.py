@@ -36,21 +36,22 @@ class Modos:
 
         self.imagenes = imagenes
         self.miniaturas = []
+        
         self.posiciones_min = []
-        self.espaciado = ANCHO // 16
-        self.margen_x = 40
-        self.margen_y = ANCHO // 4
+        self.espaciado = ANCHO // 20
+        self.margen_x = 60
+        self.margen_y = ANCHO // 9
         #Cargando imágenes
         for i in range(0, 8):
             self.miniaturas.append(imagenes[i])
-            self.miniaturas[i] = pygame.transform.smoothscale(self.miniaturas[i], (140, 140))
+            self.miniaturas[i] = pygame.transform.smoothscale(self.miniaturas[i], (210, 210))
         
-        self.tam_miniatura = 140 #Tamaño de las miniaturas, tanto horizontal, como vertical
+        
         
         for i in range(2):
             for j in range(4):
-                x = self.margen_x + j * (270 + self.espaciado)
-                y = self.margen_y + i * (100 + self.espaciado)
+                x = self.margen_x + j * (250 + self.espaciado)
+                y = self.margen_y + i * (250 + self.espaciado)
                 self.posiciones_min.append((x,y))
         
 
@@ -63,9 +64,9 @@ class Modos:
 
         color = Cambiar_color_boton(self.b_simple, VERDE, VERDE_CAMBIO)
         pygame.draw.rect(self.pantalla, color, self.b_simple)
-        text_facil = self.fuente_boton.render("Simple", True, BLANCO)
-        self.pantalla.blit(text_facil, (self.b_simple.x + self.b_simple.width // 2 - text_facil.get_width() // 2, 
-                                        self.b_simple.y + self.b_simple.height // 2 - text_facil.get_height() // 2))
+        text_jugar = self.fuente_boton.render("Simple", True, BLANCO)
+        self.pantalla.blit(text_jugar, (self.b_simple.x + self.b_simple.width // 2 - text_jugar.get_width() // 2, 
+                                        self.b_simple.y + self.b_simple.height // 2 - text_jugar.get_height() // 2))
 
         color = Cambiar_color_boton(self.b_contrarreloj, VERDE, VERDE_CAMBIO)
         pygame.draw.rect(self.pantalla, color, self.b_contrarreloj)
@@ -105,7 +106,7 @@ class Modos:
 
         for idx in range(0, 8): 
             x, y = self.posiciones_min[idx]
-            cuadro = pygame.Rect(x, y, 150, 150)
+            cuadro = pygame.Rect(x, y, 220, 220)
             pygame.draw.rect(self.pantalla, GRIS_CLARO, cuadro)
             self.pantalla.blit(self.miniaturas[idx], (x, y))
 
@@ -133,7 +134,7 @@ class Modos:
 
 
         
-        self.text_facil = self.fuente_boton.render("Fácil", True, BLANCO)
+        text_facil = self.fuente_boton.render("Fácil", True, BLANCO)
         
 
        
@@ -158,21 +159,21 @@ class Modos:
 
             color = Cambiar_color_boton(self.b_facil, VERDE, VERDE_CAMBIO)
             pygame.draw.rect(self.pantalla, color, self.b_facil)
-            self.pantalla.blit(self.text_facil, 
-                               (self.b_facil.x + self.b_facil.width // 2 - self.text_facil.get_width() // 2,
-                                self.b_facil.y + self.b_facil.height // 2 - self.text_facil.get_height() // 2))
+            self.pantalla.blit(text_facil, 
+                               (self.b_facil.x + self.b_facil.width // 2 - text_facil.get_width() // 2,
+                                 self.b_facil.y + self.b_facil.height // 2 - text_facil.get_height() // 2))
 
             color = Cambiar_color_boton(self.b_intermedio, VERDE, VERDE_CAMBIO)
             pygame.draw.rect(self.pantalla, color, self.b_intermedio)
-            self.pantalla.blit(text_intermedio, 
-                               (self.b_intermedio.x + self.b_intermedio.width //2 - text_intermedio.get_width() // 2, 
-                                self.b_intermedio.y + self.b_intermedio.height // 2 - text_intermedio.get_height() //2))
+            self.pantalla.blit(text_intermedio,
+                                (self.b_intermedio.x + self.b_intermedio.width //2 - text_intermedio.get_width() // 2, 
+                                  self.b_intermedio.y + self.b_intermedio.height // 2 - text_intermedio.get_height() //2))
 
             color = Cambiar_color_boton(self.b_dificil, VERDE, VERDE_CAMBIO)
             pygame.draw.rect(self.pantalla, color, self.b_dificil)
             self.pantalla.blit(text_dificil, 
                                (self.b_dificil.x + self.b_dificil.width // 2 - text_dificil.get_width() // 2,
-                                self.b_dificil.y + self.b_dificil.height // 2 - text_dificil.get_height() // 2))
+                                 self.b_dificil.y + self.b_dificil.height // 2 - text_dificil.get_height() // 2))
 
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
@@ -188,7 +189,7 @@ class Modos:
                         return "Facil"
                     
                     if self.b_intermedio.collidepoint(evento.pos):
-                        click_boton()
+                        click_boton
                         return "Intermedio"
                     
                     if self.b_dificil.collidepoint(evento.pos):
@@ -256,7 +257,7 @@ class Modos:
                                     x_click, y_click = evento2.pos
                                         
                                     for idx, (x, y) in enumerate(self.posiciones_min):
-                                        clicado = pygame.Rect(x, y, 150, 150)
+                                        clicado = pygame.Rect(x, y, 220, 220)
                                         if clicado.collidepoint(x_click, y_click):
                                                 
                                             juego = Juego(filas, columnas, self.imagenes[idx])
@@ -319,7 +320,7 @@ class Modos:
                                     x_click, y_click = evento2.pos
                                         
                                     for idx, (x, y) in enumerate(self.posiciones_min):
-                                        clicado = pygame.Rect(x, y, 150, 150)
+                                        clicado = pygame.Rect(x, y, 220, 220)
                                         if clicado.collidepoint(x_click, y_click): 
                                             juego = Contrarreloj(filas, columnas,
                                                                 self.imagenes[idx], tiempo)

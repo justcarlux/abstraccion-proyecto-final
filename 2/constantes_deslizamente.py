@@ -1,5 +1,6 @@
 import pygame
 pygame.init()
+
 #Dimensiones de la ventana
 ANCHO = 1280
 ALTO = 720
@@ -16,7 +17,6 @@ AZUL = (0,0, 200)
 AZUL_CAMBIO = (7, 7, 182)
 AZUL_CLARO = (51, 221, 255)
 ROJO_CAMBIO = (211, 0, 0)
-
 AMARILLO = (255, 255, 51)
 
 #Imagenes para los rompecabezas
@@ -33,6 +33,5 @@ INSTRUCCIONES = [
             "→ La pieza seleccionada se moverá al espacio vacío, dejando libre su posición anterior.",
             "→ Mueve todas las piezas hasta armar la imagen original para ganar la partida."
         ]
-
 
 pygame.quit()

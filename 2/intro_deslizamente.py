@@ -8,7 +8,7 @@ class DeslizamenteIntro():
     def __init__(self):
         self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
         pygame.display.set_caption("Deslizamente")
-        self.fondoOrg = pygame.image.load("fondo_intro4.jpg").convert_alpha()
+        self.fondoOrg = pygame.image.load("fondo_intro.jpg").convert_alpha()
         self.fondo =  pygame.transform.scale(self.fondoOrg, (ANCHO,ALTO))
         self.fuente_titulo = pygame.font.SysFont("Consolas", 30)
         self.fuente_titulo2 = pygame.font.SysFont("Consolas", 40)

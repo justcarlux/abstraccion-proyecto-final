@@ -244,9 +244,6 @@ class Juego:
                             resultado = self.dibujar_win(self.PANTALLA)
                             if resultado == "menu":
                                 ejecutando = False
-                                pygame.mixer.music.stop()
-                                pygame.mixer.music.load("Soundtrack-inicio.mp3")
-                                pygame.mixer.music.play(-1)
                                 return resultado
                                 
                                 
@@ -314,7 +311,7 @@ class Juego:
                 if evento.type == pygame.MOUSEBUTTONDOWN:
                     
                     if b_salir.collidepoint(evento.pos):
-                        click_boton()
+                        
                         return "menu"
                     
             pygame.display.flip()
@@ -466,9 +463,7 @@ class Contrarreloj(Juego):
                             resultado = self.dibujar_win(self.PANTALLA)
                             if resultado == "menu":
                                 ejecutando = False
-                                pygame.mixer.music.stop()
-                                pygame.mixer.music.load("Soundtrack-inicio.mp3")
-                                pygame.mixer.music.play(-1)
+
 
 
 
