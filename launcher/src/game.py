@@ -43,6 +43,7 @@ class Game:
             self.clock.tick(60)
 
     def stop(self):
+        self.storage.close()
         self.is_running = False
 
     def handle_events(self):
