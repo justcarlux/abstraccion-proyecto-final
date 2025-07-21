@@ -1,5 +1,5 @@
 import pygame
-from component.entries import GameEntries
+from entries import GameEntryRegistry
 from component.launcher_title import LauncherTitle
 from component.volume import VolumeToggler
 from util.asset_paths import image_path
@@ -15,7 +15,7 @@ class Game:
         self.is_running = True
         self.clock = pygame.time.Clock()
         self.background = pygame.image.load(image_path("background.png"))
-        self.game_entries = GameEntries(self.display)
+        self.entries = GameEntryRegistry(self.display)
         self.launcher_title = LauncherTitle(self.display)
         self.storage = StorageDriver()
         self.settings = SettingsManager(self.storage)
@@ -31,10 +31,10 @@ class Game:
             
             self.display.blit(self.background, (0, 0))
             self.launcher_title.draw()
-            self.game_entries.draw()
+            self.entries.draw()
             self.volume_toggler.draw()
 
-            if (self.game_entries.hovered or self.volume_toggler.hovered):
+            if (self.entries.hovered or self.volume_toggler.hovered):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
@@ -51,6 +51,6 @@ class Game:
             if event.type == pygame.QUIT:
                 self.stop()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                self.game_entries.on_screen_click()
+                self.entries.on_screen_click()
                 if (self.volume_toggler.hovered):
                     self.volume_toggler.on_click()
