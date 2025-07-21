@@ -5,6 +5,8 @@ import os
 import sys
 import colorsys
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 class ColoresMagicosPygame:
     FUENTE_TITULO = 'Baloo2-VariableFont_wght.ttf'
     TAM_TITULO = 62
@@ -15,6 +17,8 @@ class ColoresMagicosPygame:
 
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
+        
         self.ANCHO = 1280
         self.ALTO = 720
         self.pantalla = pygame.display.set_mode((self.ANCHO, self.ALTO))
@@ -65,6 +69,8 @@ class ColoresMagicosPygame:
         self.boton_click = None
         self.tiempo_click = 0
         self.duracion_click = 300
+        self.sonidos_colores = {}
+        self.cargar_sonidos_colores()
 
     def inicializar_base_datos(self):
         try:
@@ -638,6 +644,9 @@ class ColoresMagicosPygame:
         self.tiempo_ultimo_evento = pygame.time.get_ticks()
 
     def color_clicado(self, color):
+        if color in self.sonidos_colores:
+            self.sonidos_colores[color].play()
+        
         if self.estado_juego == "jugando":
             posicion_actual = len(self.respuesta_actual)
             if posicion_actual < len(self.secuencia):
@@ -650,6 +659,8 @@ class ColoresMagicosPygame:
                         self.estado_juego = "completado"
                         self.tiempo_ultimo_evento = pygame.time.get_ticks()
                 else:
+                    if hasattr(self, 'sonido_error') and self.sonido_error:
+                        self.sonido_error.play()
                     self.fin_juego()
 
     def verificar_respuesta(self):
@@ -695,6 +706,30 @@ class ColoresMagicosPygame:
             print(f"Error al cargar imagen de botones: {e}")
             self.imagen_boton = None
 
+    def cargar_sonidos_colores(self):
+        try:
+            sonidos = {
+                "azul": "sonidos/sonido_azul.wav",
+                "verde": "sonidos/sonido_verde.wav", 
+                "rosa": "sonidos/sonido_rosa.wav",
+                "amarillo": "sonidos/sonido_amarillo.wav"
+            }
+            for color, archivo in sonidos.items():
+                if os.path.exists(archivo):
+                    self.sonidos_colores[color] = pygame.mixer.Sound(archivo)
+                    self.sonidos_colores[color].set_volume(0.2)  
+                else:
+                    print(f"Archivo de sonido no encontrado: {archivo}")
+            
+            if os.path.exists("sonidos/sonido_incorrecto.wav"):
+                self.sonido_error = pygame.mixer.Sound("sonidos/sonido_incorrecto.wav")
+                self.sonido_error.set_volume(0.6)  
+            else:
+                print("Archivo de sonido de error no encontrado: sonidos/sonido_incorrecto.wav")
+                self.sonido_error = None
+        except Exception as e:
+            print(f"Error al cargar sonidos: {e}")
+
     def actualizar_juego(self):
         tiempo_actual = pygame.time.get_ticks()
         necesita_actualizar = False
@@ -710,6 +745,9 @@ class ColoresMagicosPygame:
                         self.estado_apagado_repetido = False
                         self.color_iluminado = self.secuencia[self.indice_secuencia]
                         self.tiempo_iluminacion = tiempo_actual
+                        color_actual = self.secuencia[self.indice_secuencia]
+                        if color_actual in self.sonidos_colores:
+                            self.sonidos_colores[color_actual].play()
                         necesita_actualizar = True
                 elif self.color_iluminado is None:
                     if self.indice_secuencia > 0 and self.secuencia[self.indice_secuencia] == self.secuencia[self.indice_secuencia-1]:
@@ -719,6 +757,9 @@ class ColoresMagicosPygame:
                     else:
                         self.color_iluminado = self.secuencia[self.indice_secuencia]
                         self.tiempo_iluminacion = tiempo_actual
+                        color_actual = self.secuencia[self.indice_secuencia]
+                        if color_actual in self.sonidos_colores:
+                            self.sonidos_colores[color_actual].play()
                         necesita_actualizar = True
                 else:
                     pausa_extra = 0
@@ -774,6 +815,11 @@ class ColoresMagicosPygame:
 
     def ejecutar(self):
         reloj = pygame.time.Clock()
+
+        pygame.mixer.music.load("sonidos/musica_fondo.wav")
+        pygame.mixer.music.set_volume(0.1)  
+        pygame.mixer.music.play(-1)
+
         ejecutando = True
         while ejecutando:
             ejecutando = self.manejar_eventos()
@@ -801,3 +847,7 @@ def main():
 
 if __name__ == "__main__":
     main() 
+
+
+
+    
