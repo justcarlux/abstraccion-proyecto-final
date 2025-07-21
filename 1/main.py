@@ -2,7 +2,6 @@ import pygame
 import sys
 import math
 import random
-from logic import LogicaSimon
 
 pygame.init()
 
@@ -95,11 +94,11 @@ class SimonButton:
         self.rect = pygame.Rect(center[0] - radius, center[1] - radius, radius * 2, radius * 2)
         self.sound = sound
         self.is_highlighted = False
-    
-    def draw(self, surface, is_highlighted=False):
+
+    def draw(self):
         # Más claro si está presionado
-        draw_color = self.highlight_color if is_highlighted or self.is_highlighted else self.color
-        pygame.draw.arc(surface, draw_color, self.rect, self.start_angle, self.stop_angle, self.radius)
+        draw_color = self.highlight_color if self.is_highlighted else self.color
+        pygame.draw.arc(self.surface, draw_color, self.rect, self.start_angle, self.stop_angle, self.radius)
 
     def play_sound(self):
         if self.sound:
@@ -123,7 +122,6 @@ class SimonSaysGame:
         self.running = True
         self.state = "menu"  # menu, input, game, howto, accessibility
         self.show_accessibility = False
-        
 
         # Fondo amigable
         try:
@@ -154,15 +152,12 @@ class SimonSaysGame:
         try:
             self.menu_hover_sound = pygame.mixer.Sound(MENU_HOVER_SOUND)
             self.menu_click_sound = pygame.mixer.Sound(MENU_CLICK_SOUND)
-            self.menu_click_sound.set_volume(0.25)
         except:
             self.menu_hover_sound = self.menu_click_sound = None
-        sonido  = pygame.mixer.Sound(MENU_HOVER_SOUND)
-        sonido.set_volume(0.2)
 
-        self.play_button = Button(self.screen, "Jugar", (76, 175, 80), (-1, self.button_initial_y), (self.button_width, self.button_height), sonido)
-        self.howto_button = Button(self.screen, "Cómo se juega", (33, 150, 243), (-1, self.button_initial_y + self.button_height + self.button_separation), (self.button_width, self.button_height), sonido)
-        self.close_button = Button(self.screen, "Salir", (244, 67, 54), (-1, self.button_initial_y + self.button_height * 2 + self.button_separation * 2), (self.button_width, self.button_height), sonido)
+        self.play_button = Button(self.screen, "Jugar", (76, 175, 80), (-1, self.button_initial_y), (self.button_width, self.button_height), self.menu_hover_sound)
+        self.howto_button = Button(self.screen, "Cómo se juega", (33, 150, 243), (-1, self.button_initial_y + self.button_height + self.button_separation), (self.button_width, self.button_height), self.menu_hover_sound)
+        self.close_button = Button(self.screen, "Salir", (244, 67, 54), (-1, self.button_initial_y + self.button_height * 2 + self.button_separation * 2), (self.button_width, self.button_height), self.menu_hover_sound)
         self.input_box = InputBox(300, 300, 200, 40, self.font)
         self.username = ""
         self.error_message = ""
@@ -171,13 +166,9 @@ class SimonSaysGame:
         # --- Simon Game Setup ---
         try:
             green_sound = pygame.mixer.Sound("sounds/f_sharp.wav")
-            green_sound.set_volume(0.9)
             red_sound = pygame.mixer.Sound("sounds/c_sharp.wav")
-            red_sound.set_volume(0.9)
             yellow_sound = pygame.mixer.Sound("sounds/a_sharp.wav")
-            yellow_sound.set_volume(0.9)
             blue_sound = pygame.mixer.Sound("sounds/d_sharp.wav")
-            blue_sound.set_volume(0.9)
         except pygame.error:
             green_sound = red_sound = yellow_sound = blue_sound = None
 
@@ -196,13 +187,9 @@ class SimonSaysGame:
             SimonButton(self.screen, (155, 155, 0), (255, 255, 120), simon_center, simon_radius, math.pi, 3 * math.pi / 2, yellow_sound),
             SimonButton(self.screen, (0, 0, 155), (120, 120, 255), simon_center, simon_radius, 3 * math.pi / 2, 2 * math.pi, blue_sound),
         ]
-        self.logica = LogicaSimon(self.simon_buttons, self.screen)
-        self.fuente = pygame.font.SysFont("Arial Black", 20)  # Fuente para mostrar nivel/puntaje
-        self.boton_flash = None
-        self.tiempo_flash = 0
-        
+
         # Botón de volver
-        self.back_button = Button(self.screen, "Volver", (100, 100, 100), (self.screen.get_width() - 140, 20), (120, 40), sonido)
+        self.back_button = Button(self.screen, "Volver", (100, 100, 100), (self.screen.get_width() - 140, 20), (120, 40), self.menu_hover_sound)
 
         # Imagen y texto para "Cómo se juega"
         try:
@@ -210,6 +197,33 @@ class SimonSaysGame:
             self.howto_img = pygame.transform.scale(self.howto_img, (250, 250))
         except:
             self.howto_img = None
+
+        # Cargar SVG de la nube
+        try:
+            # Intentar cargar el SVG usando cairosvg para convertirlo a PNG
+            import cairosvg
+            import io
+            
+            # Convertir SVG a PNG en memoria con las dimensiones más grandes
+            svg_data = open("cloud.svg", "rb").read()
+            png_data = cairosvg.svg2png(bytestring=svg_data, output_width=750, output_height=350)
+            
+            # Cargar la imagen PNG desde memoria
+            png_io = io.BytesIO(png_data)
+            self.cloud_img = pygame.image.load(png_io).convert_alpha()
+        except ImportError:
+            # Si cairosvg no está disponible, usar el método de dibujo manual
+            self.cloud_img = None
+        except:
+            self.cloud_img = None
+
+        # Cargar imagen de Goku para la página de reglas
+        try:
+            self.goku_img = pygame.image.load("goku.png").convert_alpha()
+            # Escalar la imagen aún más grande para el centro inferior
+            self.goku_img = pygame.transform.scale(self.goku_img, (220, 220))
+        except:
+            self.goku_img = None
 
         self.howto_text = [
             "El juego Simon muestra una secuencia de colores.",
@@ -221,12 +235,66 @@ class SimonSaysGame:
         # Música
         pygame.mixer.music.load(MENU_MUSIC)
         pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(0.25)  # Valores entre 0.0 (mute) y 1.0 (máximo)
-
 
     def switch_music(self, music_file):
         pygame.mixer.music.load(music_file)
         pygame.mixer.music.play(-1)
+
+    def draw_cloud(self, surface, center_x, center_y, width, height):
+        """Dibuja una nube estilo SVG más elaborada y realista"""
+        # Colores con gradiente
+        cloud_color = (248, 248, 255)  # Blanco fantasma
+        shadow_color = (230, 230, 240)  # Sombra sutil
+        border_color = (180, 180, 200)  # Borde más suave
+        highlight_color = (255, 255, 255)  # Brillo
+        
+        # Escala base para los círculos
+        base_radius = min(width, height) // 6
+        
+        # Crear múltiples capas de círculos para efecto más realista
+        cloud_circles = [
+            # Capa inferior (sombras)
+            {'pos': (center_x - base_radius * 2, center_y + 10), 'radius': base_radius * 1.8, 'color': shadow_color},
+            {'pos': (center_x + base_radius * 1.5, center_y + 8), 'radius': base_radius * 1.6, 'color': shadow_color},
+            {'pos': (center_x, center_y + 5), 'radius': base_radius * 2, 'color': shadow_color},
+            
+            # Capa principal
+            {'pos': (center_x - base_radius * 2, center_y), 'radius': base_radius * 1.8, 'color': cloud_color},
+            {'pos': (center_x + base_radius * 1.5, center_y - 2), 'radius': base_radius * 1.6, 'color': cloud_color},
+            {'pos': (center_x, center_y), 'radius': base_radius * 2, 'color': cloud_color},
+            
+            # Círculos superiores
+            {'pos': (center_x - base_radius * 1.2, center_y - base_radius * 1.3), 'radius': base_radius * 1.4, 'color': cloud_color},
+            {'pos': (center_x + base_radius * 0.8, center_y - base_radius * 1.5), 'radius': base_radius * 1.2, 'color': cloud_color},
+            {'pos': (center_x - base_radius * 0.2, center_y - base_radius * 1.8), 'radius': base_radius * 1.1, 'color': cloud_color},
+            
+            # Círculos laterales adicionales
+            {'pos': (center_x - base_radius * 3, center_y - base_radius * 0.5), 'radius': base_radius * 1.3, 'color': cloud_color},
+            {'pos': (center_x + base_radius * 2.8, center_y - base_radius * 0.3), 'radius': base_radius * 1.1, 'color': cloud_color},
+            
+            # Pequeños círculos de detalle
+            {'pos': (center_x - base_radius * 0.8, center_y - base_radius * 2.2), 'radius': base_radius * 0.8, 'color': cloud_color},
+            {'pos': (center_x + base_radius * 1.2, center_y - base_radius * 2), 'radius': base_radius * 0.7, 'color': cloud_color},
+            {'pos': (center_x - base_radius * 2.5, center_y - base_radius * 1.8), 'radius': base_radius * 0.9, 'color': cloud_color},
+        ]
+        
+        # Dibujar todos los círculos
+        for circle in cloud_circles:
+            pygame.draw.circle(surface, circle['color'], circle['pos'], circle['radius'])
+        
+        # Agregar bordes suaves
+        for circle in cloud_circles[3:]:  # Solo los círculos principales, no las sombras
+            pygame.draw.circle(surface, border_color, circle['pos'], circle['radius'], 2)
+        
+        # Agregar algunos highlights para efecto 3D
+        highlight_circles = [
+            {'pos': (center_x - base_radius * 0.5, center_y - base_radius * 0.3), 'radius': base_radius * 0.4},
+            {'pos': (center_x - base_radius * 1.8, center_y - base_radius * 0.8), 'radius': base_radius * 0.3},
+            {'pos': (center_x + base_radius * 1.2, center_y - base_radius * 1.2), 'radius': base_radius * 0.25},
+        ]
+        
+        for highlight in highlight_circles:
+            pygame.draw.circle(surface, highlight_color, highlight['pos'], highlight['radius'])
 
     def run(self):
         while self.running:
@@ -248,6 +316,7 @@ class SimonSaysGame:
             self.clock.tick(60)
 
     def draw_accessibility_button(self):
+        # Hide the button on "howto" screen
         if self.state == "howto":
             return
         pygame.draw.circle(self.screen, (255, 200, 0), (30, 30), 20)
@@ -257,6 +326,7 @@ class SimonSaysGame:
         self.screen.blit(txt, txt_rect)
 
     def draw_accessibility_window(self):
+        # Create a semi-transparent surface for the pop-up
         surf = pygame.Surface((650, 250), pygame.SRCALPHA)
         # Draw the box with rounded corners and padding
         pygame.draw.rect(surf, (*ACCESSIBILITY_COLOR, 240), surf.get_rect(), border_radius=15)
@@ -292,9 +362,11 @@ class SimonSaysGame:
                 self.show_accessibility = False
 
     def draw_menu(self):
+        # Usar la imagen del título si está disponible
         if self.title_image:
             self.screen.blit(self.title_image, self.title_rect)
         else:
+            # Fallback a texto si la imagen no carga
             title_surface = self.title_font.render("Simon Says", True, TEXT_COLOR)
             self.screen.blit(title_surface, (self.screen.get_width() // 2 - title_surface.get_width() // 2, 100))
 
@@ -352,20 +424,15 @@ class SimonSaysGame:
         self.screen.blit(self.background_image, (0, 0))
         title_surface = self.title_font.render("Simon Says", True, TEXT_COLOR)
         self.screen.blit(title_surface, (self.screen.get_width() // 2 - title_surface.get_width() // 2, 20))
-        self.back_button.draw()
-        
+        score_surface = self.font.render(f"Puntos: {self.score}", True, TEXT_COLOR)
+        self.screen.blit(score_surface, (20, 20))
         if self.username:
             user_surface = self.font.render(f"Jugador: {self.username}", True, TEXT_COLOR)
-            self.screen.blit(user_surface, (20, 75))
-
-        if self.logica.estado == "esperando":
-            self.logica.iniciar_nueva_ronda()
-            
-        self.logica.actualizar()
+            self.screen.blit(user_surface, (20, 60))
 
         # --- Simon Toy ---
         for btn in self.simon_buttons:
-            btn.draw(self.screen, btn.is_highlighted)
+            btn.draw()
         pygame.draw.circle(self.screen, (0, 0, 0), self.simon_buttons[0].center, self.simon_center_hub_radius)
         self.screen.blit(self.simon_logo_surface, self.simon_logo_rect)
         self.back_button.draw()
@@ -373,49 +440,56 @@ class SimonSaysGame:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if self.logica.estado == "jugando":
-                    for boton in self.simon_buttons:
-                        if boton.is_clicked(event.pos):
-                            boton.is_highlighted = True
-                            boton.play_sound()
-                        
-                            for b in self.simon_buttons:
-                                b.draw(self.screen, b.is_highlighted)
-                                pygame.draw.circle(self.screen, (0, 0, 0), self.simon_buttons[0].center, self.simon_center_hub_radius)
-                                titulo = self.simon_logo_font.render("SIMON", True, (255, 255, 255))
-                                self.screen.blit(titulo, (400 - titulo.get_width() // 2, 350 - titulo.get_height() // 2))
-                                self.logica.mostrar_nivel(self.fuente)
-                                self.logica.mostrar_puntaje(self.fuente)
-
-                            pygame.display.flip()
-                            pygame.time.delay(150)
-
-                            boton.is_highlighted = False
-
-                            resultado = self.logica.registrar_clic(boton)
-                            if resultado == "perdio":
-                                print("¡Perdiste!")
-                                self.logica.reiniciar_juego()
-                            elif resultado == "nivel_completado":
-                                print("¡Nivel superado!")
-                                pygame.time.delay(50)
-                if self.back_button.is_clicked(event):
-                    self.switch_music(MENU_MUSIC)
-                    self.state = "menu"
-
-        self.logica.mostrar_nivel(self.fuente)
-        self.logica.mostrar_puntaje(self.fuente)
-        
+            if self.back_button.is_clicked(event):
+                self.switch_music(MENU_MUSIC)
+                self.state = "menu"
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                px, py = event.pos
+                cx, cy = self.simon_buttons[0].center
+                if (px - cx)**2 + (py - cy)**2 > self.simon_center_hub_radius**2:
+                    for btn in self.simon_buttons:
+                        if btn.is_clicked(event.pos):
+                            btn.is_highlighted = True
+                            btn.play_sound()
+            if event.type == pygame.MOUSEBUTTONUP:
+                for btn in self.simon_buttons:
+                    btn.is_highlighted = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.Rect(10, 10, 40, 40).collidepoint(event.pos):
+                    self.show_accessibility = True
 
     def draw_howto(self):
         settings_title = self.font.render("Cómo se juega", True, TEXT_COLOR)
         self.screen.blit(settings_title, (self.screen.get_width() // 2 - settings_title.get_width() // 2, 60))
-        if self.howto_img:
-            self.screen.blit(self.howto_img, (self.screen.get_width() // 2 - 125, 120))
+        
+        # Usar la nube SVG si está disponible, sino usar el método de dibujo manual
+        cloud_center_x = self.screen.get_width() // 2
+        cloud_center_y = 280
+        
+        if self.cloud_img:
+            # Usar la imagen SVG convertida
+            cloud_x = cloud_center_x - self.cloud_img.get_width() // 2
+            cloud_y = cloud_center_y - self.cloud_img.get_height() // 2
+            self.screen.blit(self.cloud_img, (cloud_x, cloud_y))
+        else:
+            # Fallback al método de dibujo manual con las dimensiones más grandes
+            cloud_width = 750
+            cloud_height = 350
+            self.draw_cloud(self.screen, cloud_center_x, cloud_center_y, cloud_width, cloud_height)
+        
+        # Mostrar el texto de las reglas dentro de la nube
+        text_font = pygame.font.SysFont("Open Sans", 24)
+        text_start_y = cloud_center_y - 60
         for i, line in enumerate(self.howto_text):
-            txt = self.font.render(line, True, TEXT_COLOR)
-            self.screen.blit(txt, (self.screen.get_width() // 2 - txt.get_width() // 2, 400 + i * 30))
+            txt = text_font.render(line, True, TEXT_COLOR)
+            self.screen.blit(txt, (self.screen.get_width() // 2 - txt.get_width() // 2, text_start_y + i * 30))
+        
+        # Mostrar imagen de Goku centrada en la parte inferior
+        if self.goku_img:
+            goku_x = self.screen.get_width() // 2 - self.goku_img.get_width() // 2
+            goku_y = self.screen.get_height() - self.goku_img.get_height() - 30
+            self.screen.blit(self.goku_img, (goku_x, goku_y))
+        
         self.back_button.draw()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
