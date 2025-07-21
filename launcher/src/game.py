@@ -4,6 +4,8 @@ from component.launcher_title import LauncherTitle
 from component.volume import VolumeToggler
 from util.asset_paths import image_path
 from manager.sounds import SoundManager
+from storage import StorageDriver
+from manager.settings import SettingsManager
 
 class Game:
     def __init__(self):
@@ -15,11 +17,14 @@ class Game:
         self.background = pygame.image.load(image_path("background.png"))
         self.game_entries = GameEntries(self.display)
         self.launcher_title = LauncherTitle(self.display)
+        self.storage = StorageDriver()
+        self.settings = SettingsManager(self.storage)
         self.sound_manager = SoundManager()
-        self.volume_toggler = VolumeToggler(self.display, self.sound_manager)
+        self.volume_toggler = VolumeToggler(self.display, self.sound_manager, self.settings)
 
     def run(self):
-        self.sound_manager.play_music()
+        if (self.settings.music_enabled):
+            self.sound_manager.play_music()
         while self.is_running:
             self.handle_events()
             self.display.fill((0, 0, 0))
